@@ -1,8 +1,8 @@
 /**
- * Cloudflare Workers Builds → Slack Notifications
+ * Cloudflare Workers Builds → Discord Notifications
  *
  * This worker consumes build events from a Cloudflare Queue and sends
- * notifications to Slack with:
+ * native Discord webhook notifications with:
  * - Preview/Live URLs for successful builds
  * - Error messages for failed builds
  * - Cancellation notices for cancelled builds
@@ -15,12 +15,14 @@
 import type { Env, CloudflareEvent } from "./types";
 import { getBuildStatus } from "./helpers";
 import { fetchBuildUrls, fetchBuildLogs } from "./api";
-import { buildSlackPayload, sendSlackNotification } from "./slack";
+import { buildDiscordPayload, sendDiscordNotification } from "./discord";
+
+export type { Env, CloudflareEvent } from "./types";
 
 export default {
 	async queue(batch: MessageBatch<CloudflareEvent>, env: Env): Promise<void> {
-		if (!env.SLACK_WEBHOOK_URL) {
-			console.error("SLACK_WEBHOOK_URL is not configured");
+		if (!env.DISCORD_WEBHOOK_URL) {
+			console.error("DISCORD_WEBHOOK_URL is not configured");
 			for (const message of batch.messages) {
 				message.ack();
 			}
@@ -57,9 +59,9 @@ export default {
 					logs = await fetchBuildLogs(event, env);
 				}
 
-				// Build and send Slack notification
-				const payload = buildSlackPayload(event, previewUrl, liveUrl, logs);
-				await sendSlackNotification(env.SLACK_WEBHOOK_URL, payload);
+				// Build and send native Discord notification
+				const payload = buildDiscordPayload(event, previewUrl, liveUrl, logs);
+				await sendDiscordNotification(env.DISCORD_WEBHOOK_URL, payload);
 
 				message.ack();
 			} catch (error) {

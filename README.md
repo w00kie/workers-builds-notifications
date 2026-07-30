@@ -4,12 +4,12 @@
 
 <!-- dash-content-start -->
 
-Get notified when your Workers Builds complete, fail, or are cancelled. This template uses [Queue Event Subscriptions](https://developers.cloudflare.com/queues/event-subscriptions/) to consume Workers Builds events and forward them to any webhook — Slack, Discord, or your own endpoint.
+Get notified in Discord when your Workers Builds complete, fail, or are cancelled. This template uses [Queue Event Subscriptions](https://developers.cloudflare.com/queues/event-subscriptions/) to consume Workers Builds events and send native Discord webhook messages.
 
 ## Features
 
 - 🔔 Real-time notifications for build success, failure, and cancellation
-- 🔗 Works with any webhook (Slack, Discord, custom endpoints)
+- 🔗 Uses native Discord embeds
 - 📋 Includes build details: project name, branch, commit, and author
 - 📜 Smart error extraction for failed builds, preview URL and live deployment URL for successful builds
 
@@ -86,26 +86,13 @@ wrangler deploy
 
 ---
 
-### 3. Create a Webhook
-
-#### Slack
-
-1. Go to [Slack Apps](https://api.slack.com/apps) → **Create New App** → **From scratch**
-2. Name it (e.g., "Workers Builds Notifications") and select your workspace
-3. Go to **Incoming Webhooks** → Toggle **On**
-4. Click **Add New Webhook to Workspace** → Select your channel
-5. Copy the webhook URL
-
-#### Discord
+### 3. Create a Discord Webhook
 
 1. Go to your Discord server → **Server Settings** → **Integrations** → **Webhooks**
 2. Click **New Webhook** → Select your channel
 3. Copy the webhook URL
-4. Append `/slack` to the URL (Discord supports Slack-formatted payloads)
 
-#### Other Webhooks
-
-Modify the payload format in `src/index.ts` to match your webhook's expected format.
+Use the webhook URL exactly as Discord provides it. Do not append `/slack`.
 
 ---
 
@@ -129,16 +116,16 @@ Modify the payload format in `src/index.ts` to match your webhook's expected for
 2. Select your deployed worker
 3. Go to **Settings** → **Variables and Secrets**
 4. Add:
-   - `SLACK_WEBHOOK_URL` → Your webhook URL
+   - `DISCORD_WEBHOOK_URL` → Your native Discord webhook URL
    - `CLOUDFLARE_API_TOKEN` → Your API token
 
 #### Option B: Via CLI
 
 ```bash
-wrangler secret put SLACK_WEBHOOK_URL
+npx wrangler secret put DISCORD_WEBHOOK_URL
 # Paste your webhook URL
 
-wrangler secret put CLOUDFLARE_API_TOKEN
+npx wrangler secret put CLOUDFLARE_API_TOKEN
 # Paste your API token
 ```
 
@@ -254,7 +241,7 @@ Trigger a build on any worker in your account. You should see a notification in 
 
 | Variable               | Description                                                                 |
 | ---------------------- | --------------------------------------------------------------------------- |
-| `SLACK_WEBHOOK_URL`    | Webhook URL (Slack, Discord, or custom)                                     |
+| `DISCORD_WEBHOOK_URL`  | Native Discord webhook URL                                                   |
 | `CLOUDFLARE_API_TOKEN` | API token with Workers Builds Configuration: Read and Workers Scripts: Read |
 
 ### Queue Settings (wrangler.jsonc)
