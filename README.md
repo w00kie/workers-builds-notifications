@@ -133,7 +133,8 @@ npx wrangler secret put CLOUDFLARE_API_TOKEN
 
 ### 6. Create an Event Subscription
 
-Subscribe your queue to Workers Builds events.
+Subscribe your queue to Workers Builds events. Event subscriptions persist
+independently from Worker deployments, so they only need to be created once.
 
 #### Option A: Via Dashboard
 
@@ -150,11 +151,11 @@ Subscribe your queue to Workers Builds events.
 ```bash
 wrangler queues subscription create builds-event-subscriptions \
   --source workersBuilds.worker \
-  --events build.succeeded,build.failed \
-  --worker-name <YOUR_CONSUMER_WORKER_NAME>
+  --events build.started,build.failed,build.canceled,build.succeeded \
+  --worker-name <WORKER_NAME>
 ```
 
-> For more details, see [Event Subscriptions Documentation](https://developers.cloudflare.com/queues/event-subscriptions/)
+Repeat the command for each Worker you want to monitor.
 
 ---
 
@@ -231,7 +232,7 @@ Trigger a build on any worker in your account. You should see a notification in 
 | `cf.workersBuilds.worker.build.started`                              | Build has started            |
 | `cf.workersBuilds.worker.build.succeeded`                            | Build completed successfully |
 | `cf.workersBuilds.worker.build.failed`                               | Build failed                 |
-| `cf.workersBuilds.worker.build.failed` + `buildOutcome: "cancelled"` | Build was cancelled          |
+| `cf.workersBuilds.worker.build.canceled`                             | Build was canceled           |
 
 ---
 
